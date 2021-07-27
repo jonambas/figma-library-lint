@@ -1,0 +1,7 @@
+{
+  "name": "library-lint",
+  "id": "1000532634094225438",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "ui": "dist/ui.html"
+}
