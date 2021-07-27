@@ -12,8 +12,12 @@ let errors = [];
 
 // Pass in a style id
 // Returns true if id is external to the Figma file
-function isRemote(id: string): RegExpMatchArray {
-  return id.match(/\,.+:.+/);
+function isLocal(id: string): boolean {
+  if (typeof id === 'string') {
+    return !id.match(/\,.+:.+/);
+  }
+
+  return false; // Need to investigate why fillStyleId is returning symbols
 }
 
 // Traverses through nodes
@@ -21,14 +25,27 @@ function traverse(node) {
   // Text nodes
   if (node.type === 'TEXT') {
     // Text fill style (font color)
-    // Need to investigate why fillStyleId is returning symbols
-    if (typeof node.fillStyleId === 'string' && !isRemote(node.fillStyleId)) {
+    if (isLocal(node.fillStyleId)) {
       errors.push({ id: node.id, label: node.name, message: 'Fill style not recognized' });
     }
 
     // // Text text style (font size, family, etc)
-    if (typeof node.textStyleId === 'string' && !isRemote(node.textStyleId)) {
+    if (isLocal(node.textStyleId)) {
       errors.push({ id: node.id, label: node.name, message: 'Text style not recognized' });
+    }
+  }
+
+  if (['ELLIPSE', 'POLYGON', 'RECTANGLE', 'GROUP', 'STAR'].includes(node.type)) {
+    if (node.fills?.length && isLocal(node.fillStyleId)) {
+      errors.push({ id: node.id, label: node.name, message: 'Fill style not recognized' });
+    }
+
+    if (node.strokes?.length && isLocal(node.strokeStyleId)) {
+      errors.push({ id: node.id, label: node.name, message: 'Stroke style not recognized' });
+    }
+
+    if (node.effects?.length && isLocal(node.effectStyleId)) {
+      errors.push({ id: node.id, label: node.name, message: 'Effect style not recognized' });
     }
   }
 
