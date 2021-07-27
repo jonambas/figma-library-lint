@@ -13,7 +13,7 @@ let errors = [];
 // Pass in a style id
 // Returns true if id is external to the Figma file
 function isRemote(id: string): RegExpMatchArray {
-  return id.match(/\,.+:.+/)
+  return id.match(/\,.+:.+/);
 }
 
 // Traverses through nodes
@@ -21,27 +21,24 @@ function traverse(node) {
   if (node.type !== 'PAGE') {
   }
 
-
   // Text nodes
   if (node.type === 'TEXT') {
-
     // Text fill style (font color)
     if (!isRemote(node.fillStyleId)) {
-      errors.push({ id: node.id, label: node.name, message: 'Fill style not recognized' })
+      errors.push({ id: node.id, label: node.name, message: 'Fill style not recognized' });
     }
 
     // Text text style (font size, family, etc)
     if (!isRemote(node.textStyleId)) {
-      errors.push({ id: node.id, label: node.name, message: 'Text style not recognized' })
+      errors.push({ id: node.id, label: node.name, message: 'Text style not recognized' });
     }
   }
 
-
   // Traverses child nodes
-  if ("children" in node) {
-    if (node.type !== "INSTANCE") {
+  if ('children' in node) {
+    if (node.type !== 'INSTANCE') {
       for (const child of node.children) {
-        traverse(child)
+        traverse(child);
       }
     }
   }
@@ -50,21 +47,21 @@ function traverse(node) {
 // Calls to "parent.postMessage" from within the HTML page will trigger this
 // callback. The callback will be passed the "pluginMessage" property of the
 // posted message.
-figma.ui.onmessage = msg => {
+figma.ui.onmessage = (msg) => {
   // One way of distinguishing between different types of messages sent from
   // your HTML page is to use an object with a "type" property like this.
   if (msg.type === 'lint') {
     errors = [];
-    traverse(figma.currentPage) // start the traversal at the root
-    figma.ui.postMessage({ type: 'linting-complete', data: { errors } })
+    traverse(figma.currentPage); // start the traversal at the root
+    figma.ui.postMessage({ type: 'linting-complete', data: { errors } });
   }
 
   if (msg.type === 'focus-node') {
     const node = [figma.getNodeById(msg.node)];
 
     // @ts-ignore
-    figma.currentPage.selection = node
-    figma.viewport.scrollAndZoomIntoView(node)
+    figma.currentPage.selection = node;
+    figma.viewport.scrollAndZoomIntoView(node);
   }
 
   // Make sure to close the plugin when you're done. Otherwise the plugin will
