@@ -18,18 +18,16 @@ function isRemote(id: string): RegExpMatchArray {
 
 // Traverses through nodes
 function traverse(node) {
-  if (node.type !== 'PAGE') {
-  }
-
   // Text nodes
   if (node.type === 'TEXT') {
     // Text fill style (font color)
-    if (!isRemote(node.fillStyleId)) {
+    // Need to investigate why fillStyleId is returning symbols
+    if (typeof node.fillStyleId === 'string' && !isRemote(node.fillStyleId)) {
       errors.push({ id: node.id, label: node.name, message: 'Fill style not recognized' });
     }
 
-    // Text text style (font size, family, etc)
-    if (!isRemote(node.textStyleId)) {
+    // // Text text style (font size, family, etc)
+    if (typeof node.textStyleId === 'string' && !isRemote(node.textStyleId)) {
       errors.push({ id: node.id, label: node.name, message: 'Text style not recognized' });
     }
   }
